@@ -1,10 +1,12 @@
 
-import cv2
-import numpy as np 
 import argparse
 import time
-from skimage import io
+
+import numpy as np
 import webcolors
+from cv2 import cv2
+from skimage import io
+
 
 def load_yolo():
 	net = cv2.dnn.readNet("yolov3.weights", "yolov3.cfg")
@@ -15,7 +17,6 @@ def load_yolo():
 	output_layers = [layers_names[i[0]-1] for i in net.getUnconnectedOutLayers()]
 	colors = np.random.uniform(0, 255, size=(len(classes), 3))
 	return net, classes, colors, output_layers
-
 
 
 def detect_objects(img, net, outputLayers):			
@@ -88,8 +89,6 @@ def detect_color(frame,a,b,c,d):
 		pass
 
 
-
-
 def draw_labels(boxes, confs, colors, class_ids, classes, img): 
 	indexes = cv2.dnn.NMSBoxes(boxes, confs, 0.5, 0.4)
 	font = cv2.FONT_HERSHEY_PLAIN
@@ -105,7 +104,6 @@ def draw_labels(boxes, confs, colors, class_ids, classes, img):
 				cv2.putText(img, closest_name, (x, y- 15), font, 1,color,1 )
 
 	cv2.imshow("Image", img)
-
 
 
 def start_video(video_path):
