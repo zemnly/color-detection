@@ -1,6 +1,5 @@
-
+#import libraries
 import argparse
-import time
 
 import numpy as np
 import webcolors
@@ -9,6 +8,7 @@ from skimage import io
 
 
 def load_yolo():
+	"""Load the yolov3 weights and config file with the help of dnn module of openCV."""
 	net = cv2.dnn.readNet("yolov3.weights", "yolov3.cfg")
 	classes = []
 	with open("coco.names", "r") as f:
@@ -19,13 +19,15 @@ def load_yolo():
 	return net, classes, colors, output_layers
 
 
-def detect_objects(img, net, outputLayers):			
+def detect_objects(img, net, outputLayers):		
+	"""Use blobFromImage that accepts image/frame from video or webcam stream, model and output layers as parameters."""	
 	blob = cv2.dnn.blobFromImage(img, scalefactor=0.00392, size=(320, 320), mean=(0, 0, 0), swapRB=True, crop=False)
 	net.setInput(blob)
 	outputs = net.forward(outputLayers)
 	return blob, outputs
 
 def get_box_dimensions(outputs, height, width):
+	"""The list scores is created which stores the confidence corresponding to each object. Can play around with this value."""
 	boxes = []
 	confs = []
 	class_ids = []
@@ -48,6 +50,7 @@ def get_box_dimensions(outputs, height, width):
 	return boxes, confs, class_ids
 
 def closest_colour(requested_colour):
+	#webcolors raises an exception if it can't find the match for a requested color.
     min_colours = {}
     for key, name in webcolors.CSS3_HEX_TO_NAMES.items():
         r_c, g_c, b_c = webcolors.hex_to_rgb(key)
@@ -58,6 +61,8 @@ def closest_colour(requested_colour):
     return min_colours[min(min_colours.keys())]
 
 def get_colour_name(requested_colour):
+	#this fix delivers the closest matching name for the requested RGB colour.
+
     try:
         closest_name = actual_name = webcolors.rgb_to_name(requested_colour)
     except ValueError:
@@ -66,19 +71,23 @@ def get_colour_name(requested_colour):
     return actual_name, closest_name
 
 def detect_color(frame,a,b,c,d):
+	"""Function where the color detection takes place"""
+
 	try:
 		x,y,w,h = a,b,c,d
 
 		roi = frame[y:y+h,x:x+w]
 		roi = cv2.cvtColor(roi, cv2.COLOR_BGR2RGB)
-		average = roi.mean(axis=0).mean(axis=0)
-		pixels = np.float32(roi.reshape(-1, 3))
+		average = roi.mean(axis=0).mean(axis=0) 
+		#apply k-means clustering to create a palette with the most representative colours of the image
+		pixels = np.float32(roi.reshape(-1, 3)) 
 		n_colors = 5
 		criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 200, .1)
 		flags = cv2.KMEANS_RANDOM_CENTERS
 		_, labels, palette = cv2.kmeans(pixels, n_colors, None, criteria, 10, flags)
 		_, counts = np.unique(labels, return_counts=True)
-		dominant = palette[np.argmax(counts)]
+		dominant = palette[np.argmax(counts)] #dominant colour is the palette colour which occurs most frequently on the quantized image
+		#convert into a format suitable for color name indentifier function
 		dominant=dominant.astype(int)
 		dominant=dominant.tolist()
 		dominant=tuple(dominant)
@@ -90,6 +99,7 @@ def detect_color(frame,a,b,c,d):
 
 
 def draw_labels(boxes, confs, colors, class_ids, classes, img): 
+	"""Draw bounding box and add object labels to it"""
 	indexes = cv2.dnn.NMSBoxes(boxes, confs, 0.5, 0.4)
 	font = cv2.FONT_HERSHEY_PLAIN
 	for i in range(len(boxes)):
@@ -107,6 +117,7 @@ def draw_labels(boxes, confs, colors, class_ids, classes, img):
 
 
 def start_video(video_path):
+	"""Pipeline the other functions together and read video file frame by frame performing detections on it."""
 	model, classes, colors, output_layers = load_yolo()
 	cap = cv2.VideoCapture(video_path)
 	frame_width = int(cap.get(3))
