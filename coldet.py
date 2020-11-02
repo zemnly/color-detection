@@ -51,6 +51,7 @@ def get_box_dimensions(outputs, height, width):
 				class_ids.append(class_id)
 	return boxes, confs, class_ids
 
+
 def closest_colour(requested_colour):
 	#webcolors raises an exception if it can't find the match for a requested color.
 
@@ -63,6 +64,7 @@ def closest_colour(requested_colour):
         min_colours[(rd + gd + bd)] = name
     return min_colours[min(min_colours.keys())]
 
+
 def get_colour_name(requested_colour):
 	#this fix delivers the closest matching name for the requested RGB colour.
 
@@ -72,6 +74,7 @@ def get_colour_name(requested_colour):
         closest_name = closest_colour(requested_colour)
         actual_name = None
     return actual_name, closest_name
+
 
 def detect_color(frame,a,b,c,d):
 	"""Function where the color detection takes place"""
@@ -98,8 +101,8 @@ def detect_color(frame,a,b,c,d):
 		requested_colour = dominant
 		actual_name, closest_name = get_colour_name(requested_colour)
 		return closest_name
-	except Exception:
-		pass
+	except Exception as e:
+		print('ERROR: ',e)
 
 
 def draw_labels(boxes, confs, colors, class_ids, classes, img): 
@@ -143,6 +146,5 @@ def start_video(video_path):
 			break
 	cap.release()
 	
-
 
 start_video("test.MOV")
