@@ -4,6 +4,7 @@ import numpy as np
 import webcolors
 from cv2 import cv2
 from skimage import io
+from configparser import ConfigParser
 
 
 def load_yolo():
@@ -77,7 +78,7 @@ def get_colour_name(requested_colour):
 
 
 def detect_color(frame,a,b,c,d):
-	"""Function where the color detection takes place"""
+	#Function where the color detection takes place
 
 	try:
 		x,y,w,h = a,b,c,d
