@@ -83,7 +83,6 @@ def detect_color(frame,a,b,c,d,n_colors=3):
         roi = frame[y:y+h,x:x+w]
         roi = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV) #Convert to HSV colorspace
 
-
         #apply k-means clustering to create a palette with the most representative colours of the image
         pixels = np.float32(roi.reshape(-1, 3)) 
         criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 200, .1)
