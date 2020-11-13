@@ -124,14 +124,14 @@ def draw_labels(boxes, confs, colors, class_ids, classes, img):
 
 
 
-def start_video(video_path):
+def start_video(video_path,output_path):
     #Pipeline the other functions together and read video file frame by frame performing detections on it.
 
     model, classes, colors, output_layers = load_yolo()
     cap = cv2.VideoCapture(video_path)
     frame_width = int(cap.get(3))
     frame_height = int(cap.get(4))
-    out = cv2.VideoWriter('outpy1.avi',cv2.VideoWriter_fourcc('M','J','P','G'), 10, (frame_width,frame_height))
+    out = cv2.VideoWriter(output_path,cv2.VideoWriter_fourcc('M','J','P','G'), 10, (frame_width,frame_height))
     
     while True:
         _, frame = cap.read()
@@ -151,7 +151,9 @@ def start_video(video_path):
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--source',help='Source file or device', required=True)
+parser.add_argument('--outfile',help='Path to output file. Creates one if it doesn\'t exist (Default: output.avi)',default='output.avi')
 parser.add_argument('--cluster',help='Number of clusters to generate (default:3)', default=3)
 parser.add_argument('--confidence',help='Confidence threshold for object detection (default:0.3)',default=0.3)
 args = parser.parse_args()
-start_video(args.source)
+
+start_video(args.source,args.outfile)
