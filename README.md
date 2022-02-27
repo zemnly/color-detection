@@ -2,4 +2,4 @@
 
 An algorithm for detection of objects and their colors.
 
-WIP
+
